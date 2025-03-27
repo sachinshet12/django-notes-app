@@ -24,11 +24,17 @@ pipeline {
                 }
             }
         }
-        stage("Deploy"){
+        
+        stage("Deploy to Kubernetes") {
             steps {
-                echo "Deploying the container"
-                sh "docker-compose down && docker-compose up -d"
-                
+                script {
+                    dir("notesapp") {
+                        withkubeConfig(caCertificate: "------------------------
+                        sh "kubectl delete pods --all"
+                        sh "kubectl apply -f deployment.yaml"
+                        sh "kubectl apply -f service.yaml"
+                        }     
+                    }
             }
         }
     }
